@@ -61,9 +61,9 @@ pub enum DatasetCommands {
         #[arg(long = "print")]
         print: bool,
 
-        /// Output format (json or cbor)
-        #[arg(long = "format", default_value = "json")]
-        format: String,
+        /// Output encoding (json or cbor)
+        #[arg(long = "encoding", default_value = "json")]
+        encoding: String,
 
         /// Storage backend (local or rekor)
         #[arg(long = "storage-type", default_value = "database")]
@@ -289,9 +289,9 @@ pub enum ManifestCommands {
         #[arg(long = "storage-url", default_value = "http://localhost:8080")]
         storage_url: Box<String>,
 
-        /// Output format (json or yaml)
-        #[arg(long = "format", default_value = "json")]
-        format: String,
+        /// Output encoding (json or yaml)
+        #[arg(long = "encoding", default_value = "json")]
+        encoding: String,
 
         /// Output file path (defaults to stdout if not provided)
         #[arg(short, long)]
@@ -351,9 +351,9 @@ pub enum EvaluationCommands {
         #[arg(long = "print")]
         print: bool,
 
-        /// Output format (json or cbor)
-        #[arg(long = "format", default_value = "json")]
-        format: String,
+        /// Output encoding (json or cbor)
+        #[arg(long = "encoding", default_value = "json")]
+        encoding: String,
 
         /// Storage backend (local or rekor)
         #[arg(long = "storage-type", default_value = "database")]
@@ -458,9 +458,9 @@ pub enum SoftwareCommands {
         #[arg(long = "print")]
         print: bool,
 
-        /// Output format (json or cbor)
-        #[arg(long = "format", default_value = "json")]
-        format: String,
+        /// Output encoding (json or cbor)
+        #[arg(long = "encoding", default_value = "json")]
+        encoding: String,
 
         /// Storage backend (local or rekor)
         #[arg(long = "storage-type", default_value = "database")]
@@ -532,5 +532,51 @@ pub enum SoftwareCommands {
         /// Storage URL
         #[arg(long = "storage-url", default_value = "http://localhost:8080")]
         storage_url: Box<String>,
+    },
+}
+
+#[derive(Debug, Subcommand)]
+pub enum PipelineCommands {
+    /// Generate SLSA Build Provenance v1 for the given pipeline
+    GenerateProvenance {
+        /// Paths to any pipeline inputs and other external parameters
+        #[arg(long = "inputs", num_args = 1.., value_delimiter = ',')]
+        inputs: Vec<PathBuf>,
+
+        /// Path to pipeline script or configuration
+        #[arg(long = "pipeline")]
+        pipeline: PathBuf,
+
+        /// Paths to any pipeline products
+        #[arg(long = "products", num_args = 1.., value_delimiter = ',')]
+        products: Vec<PathBuf>,
+
+        /// Path to private key file for signing (PEM format)
+        #[arg(long = "key")]
+        key: Option<PathBuf>,
+
+        /// Hash algorithm to use for signing (default: sha384)
+        #[arg(long = "hash-alg", value_enum, default_value = "sha384")]
+        hash_alg: HashAlgorithmChoice,
+
+        /// Only print SLSA Provenance without storing
+        #[arg(long = "print")]
+        print: bool,
+
+        /// Output encoding (json or cbor)
+        #[arg(long = "encoding", default_value = "json")]
+        encoding: String,
+
+        /// Storage backend (only local supported)
+        #[arg(long = "storage-type", default_value = "local-fs")]
+        storage_type: Box<String>,
+
+        /// Storage URL
+        #[arg(long = "storage-url", default_value = "http://localhost:8080")]
+        storage_url: Box<String>,
+
+        /// Collect the underlying TDX attestation, if available
+        #[arg(long = "with-tdx", default_value = "false")]
+        with_tdx: bool,
     },
 }
